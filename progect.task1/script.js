@@ -37,10 +37,11 @@ form.addEventListener('submit', async (event) => {
     const data = await fetchData(username, email);
     console.log(data);
 
-    if (data && data.length === 0) {
-        alert('Такого пользователя не существует.');
-    } else {
+    if (data && data.length > 0) {
+        renderUser(data[0]);
         alert('Авторизация успешна.');
+    } else {
+        alert('Такого пользователя не существует.');
     }
 });
 
@@ -49,9 +50,31 @@ function validateInput(event) {
 
     if (event.target.value.trim() !== '') {
         feedback.textContent = 'Поле заполнено верно.';
+        feedback.style.color = "#32CD32";
     } else {
-        feedback.textContent = '';
+        feedback.textContent = 'Поле заполнено не верно.';
+        feedback.style.color = "#FF0000"; 
     }
+}
+
+function renderUser(user) {
+    const container = document.querySelector('#userDetails');
+    form.style.display = "none";
+    container.style.display = "block";
+    container.innerHTML = `
+        <p>ID: ${user.id}</p>
+        <p>Name: ${user.name}</p>
+        <p>Username: ${user.username}</p>
+        <p>Email: ${user.email}</p>
+        <p>Phone: ${user.phone}</p>
+        <p>Website: <input id="websiteInput" value="${user.website}"></p>
+        <button id="updateWebsite">Редактировать Website</button>
+    `;
+
+    document.querySelector('#updateWebsite').addEventListener('click', () => {
+        user.website = document.getElementById('websiteInput').value;
+        alert('Website отредактирован!');
+    });
 }
 
 
