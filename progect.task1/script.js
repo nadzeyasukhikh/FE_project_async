@@ -15,7 +15,7 @@ async function fetchData(username, email) {
     return data;
     
   } catch (e) {
-    console.log('Ошибка:', e);
+    console.log('Error:', e);
   }
 }
 
@@ -39,9 +39,9 @@ form.addEventListener('submit', async (event) => {
 
     if (data && data.length > 0) {
         renderUser(data[0]);
-        alert('Авторизация успешна.');
+        
     } else {
-        alert('Такого пользователя не существует.');
+        alert('This user does not exist.');
     }
 });
 
@@ -49,17 +49,19 @@ function validateInput(event) {
     const feedback = event.target.nextElementSibling;
 
     if (event.target.value.trim() !== '') {
-        feedback.textContent = 'Поле заполнено верно.';
+        feedback.textContent = 'The field is filled in correctly.';
         feedback.style.color = "#32CD32";
     } else {
-        feedback.textContent = 'Поле заполнено не верно.';
+        feedback.textContent = 'The field is filled in incorrectly.';
         feedback.style.color = "#FF0000"; 
     }
 }
 
 function renderUser(user) {
     const container = document.querySelector('#userDetails');
+    
     form.style.display = "none";
+    
     container.style.display = "block";
     container.innerHTML = `
         <p>ID: ${user.id}</p>
@@ -68,14 +70,86 @@ function renderUser(user) {
         <p>Email: ${user.email}</p>
         <p>Phone: ${user.phone}</p>
         <p>Website: <input id="websiteInput" value="${user.website}"></p>
-        <button id="updateWebsite">Редактировать Website</button>
+        <button id="updateWebsite">Edit Website</button>
+        <button id="btnSearch">Search</button>
     `;
+    const updateWebsite = document.querySelector('#updateWebsite')
+    const websiteInput = document.querySelector('#websiteInput')
+    updateWebsite.addEventListener('click', () => {
+        user.website = websiteInput.value;
+        alert('Website edited!');
+    });
 
-    document.querySelector('#updateWebsite').addEventListener('click', () => {
-        user.website = document.getElementById('websiteInput').value;
-        alert('Website отредактирован!');
+    const btnSearch = document.querySelector("#btnSearch");
+    const nextPage = document.querySelector('#nextPage')
+    btnSearch.addEventListener("click", () => {
+        container.style.display = 'none';
+        nextPage.style.display = 'block';
     });
 }
+
+
+
+const searchInput = document.querySelector('#searchInput');
+const searchResults = document.querySelector('#searchResults');
+const btnAlbums = document.querySelector('#btnAlbums');
+const btnTodos = document.querySelector('#btnTodos');
+const btnPosts = document.querySelector('#btnPosts')
+
+let currentSearchType = "";
+
+btnAlbums.addEventListener('click', () => {
+    currentSearchType = "albums";
+    toggleSearchPage();
+});
+
+btnTodos.addEventListener('click', () => {
+    currentSearchType = "todos";
+    toggleSearchPage();
+});
+
+btnPosts.addEventListener('click', () => {
+    currentSearchType = "posts";
+    toggleSearchPage();
+});
+
+function toggleSearchPage() {
+    const nextPage = document.querySelector('#nextPage')
+    const searchContainer = document.querySelector('#searchContainer')
+    nextPage.style.display = 'none';
+    searchContainer.style.display = 'block';
+    searchInput.value = '';
+    searchResults.innerHTML = '';
+}
+
+searchInput.addEventListener('input', async (event) => {
+    const query = event.target.value;
+    if (query) {
+        const results = await searchByTitle(query, currentSearchType);
+        displayResults(results);
+    } else {
+        searchResults.innerHTML = '';
+    }
+});
+
+async function searchByTitle(query, type) {
+    try {
+        const response = await fetch(`https://jsonplaceholder.typicode.com/${type}`);
+        const data = await response.json();
+
+        return data.filter(item => item.title.toLowerCase().includes(query.toLowerCase()));
+    } catch (e) {
+        console.log('Error:', e);
+    }
+}
+
+function displayResults(results) {
+    searchResults.innerHTML = results.map(item => `<div>${item.title}</div>`).join('');
+}
+
+
+
+
 
 
 
