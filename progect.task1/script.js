@@ -146,6 +146,11 @@ async function searchByTitle(query, type) {
 function displayResults(results) {
     searchResults.innerHTML = results.map(item => `<div>${item.title}</div>`).join('');
 }
+const backBtn = document.querySelector(".backBtn")
+backBtn.addEventListener("click", () => {
+    searchContainer.style.display = 'none';
+    nextPage.style.display = 'block';
+})
 
 
 
